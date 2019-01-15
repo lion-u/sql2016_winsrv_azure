@@ -61,11 +61,11 @@
     - NET-Framework-45-ASPNET
     state: present
 
-- name: extract the installer
-  win_command: c:\sql\sql_installer.exe /q /x:c:\sql\installer
-  args:
-      chdir: c:\sql
-      creates: c:\sql\installer\setup.exe
+# - name: extract the installer
+#   win_command: c:\sql\sql_installer.exe /q /x:c:\sql\installer
+#   args:
+#       chdir: c:\sql
+#       creates: c:\sql\installer\setup.exe
    
 - name: Disable UAC Filtering for Local Accounts
   win_regedit: 
@@ -95,7 +95,7 @@
 
 - name: Install MS SQL Server using psexec module
   win_psexec:
-   command: c:\sql\installer\setup.exe /ConfigurationFile="c:\sql\sql_conf.ini" /INDICATEPROGRESS=False
+   command: c:\sql\sql_installer.exe /ConfigurationFile="c:\sql\sql_conf.ini" /INDICATEPROGRESS=False /Action=Install
    priority: high
    executable: C:\PSTools\PsExec64.exe
    elevated: yes
