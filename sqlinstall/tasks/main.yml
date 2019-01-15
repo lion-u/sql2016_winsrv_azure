@@ -91,7 +91,7 @@
     action: allow
     direction: in
     protocol: tcp
-    profiles: all
+    profiles: [Domain, Public, Private]
     state: present
     enabled: yes
 
