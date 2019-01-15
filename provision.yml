@@ -1,0 +1,11 @@
+---
+- name: provision new azure host
+  hosts: localhost
+  connection: local
+  roles:
+    - azwinsrv
+
+- name: install SQL Server to azure host  
+  hosts: sqlsrv
+  roles:
+    - sqlinstall

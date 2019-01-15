@@ -1,0 +1,5 @@
+---
+# vars file for sqlinstall
+sql_instance_name: lzdb
+ansible_user: lzadmin
+ansible_password: Q123456w!

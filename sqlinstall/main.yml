@@ -1,0 +1,4 @@
+---
+- hosts: sqlsrv
+  gather_facts: False
+

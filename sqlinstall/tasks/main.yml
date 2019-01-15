@@ -1,0 +1,120 @@
+---
+# tasks file for sqlinstall
+- name: check server connectivity
+  win_ping:
+
+- name: create a directory for installer download
+  win_file: 
+      path: c:\sql
+      state: directory
+   
+- name: create a directory for installer extraction
+  win_file: 
+      path: c:\sql\installer
+      state: directory
+
+- name: Copy a InstallSQLwithConfigIni.cmd file 
+  win_copy:
+    src: InstallSQLwithConfigIni.cmd
+    dest: c:\sql\InstallSQLwithConfigIni.cmd
+
+- name: create the configuration file
+  win_template: 
+      src: sql_conf.ini.j2
+      dest: c:\sql\sql_conf.ini
+
+- name: check downloaded file sql_installer exists
+  win_stat:
+      path: c:\sql\sql_installer.exe
+  register: installer_file
+
+- name: get the SQL installer
+  win_get_url:
+#      url: 'http://download.microsoft.com/download/E/A/E/EAE6F7FC-767A-4038-A954-49B8B05D04EB/ExpressAndTools%2064BIT/SQLEXPRWT_x64_ENU.exe'
+      url: 'https://download.microsoft.com/download/9/2/B/92BAD988-00C5-4F68-811E-B7FFBE009B00/SQLServer2016SP2-KB4052908-x64-ENU.exe'
+      dest: 'c:\sql\sql_installer.exe'
+  when: not installer_file.stat.exists
+
+- name: check downloaded file PSTools exists
+  win_stat:
+      path: c:\sql\PSTools.zip
+  register: PSTools_file
+
+- name: get the psexec
+  win_get_url:
+      url: 'https://download.sysinternals.com/files/PSTools.zip'
+      dest: 'c:\sql\PSTools.zip'
+  when: not PSTools_file.stat.exists
+
+- name: Unzip PSTools.zip
+  win_unzip:
+    src: c:\sql\PSTools.zip
+    dest: C:\PSTools
+
+- name: Install NET-Framework
+  win_feature:
+    name:
+    - NET-Framework-Core
+    - NET-Framework-Features
+    - NET-Framework-45-Features
+    - NET-Framework-45-Core
+    - NET-Framework-45-ASPNET
+    state: present
+
+- name: extract the installer
+  win_command: c:\sql\sql_installer.exe /q /x:c:\sql\installer
+  args:
+      chdir: c:\sql
+      creates: c:\sql\installer\setup.exe
+   
+#- name: Install the database
+# win_command: c:\sql\installer\setup.exe /configurationfile=c:\sql\sql_conf.ini
+#  args:
+#      chdir: c:\sql
+
+#- name: Copy psexec module
+#  copy:
+#    src: PsExec.exe
+#    dest: c:\sql
+
+- name: Disable UAC Filtering for Local Accounts
+  win_regedit: 
+      data: 1
+      datatype: dword
+      key: "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
+      value: LocalAccountTokenFilterPolicy    
+
+- name: Firewall rule to allow TCP port 1433
+  win_firewall_rule:
+    name: SQL Server port 1433
+    localport: 1433
+    action: allow
+    direction: in
+    protocol: tcp
+    profiles: all
+    state: present
+    enabled: yes
+
+- name: Add or update registry for ip port
+  win_regedit:
+      path: 'HKLM:\Software\Microsoft\Microsoft SQL Server\MSSQL12.{{ sql_instance_name }}\MSSQLServer\SuperSocketNetLib\Tcp\IPAll'
+      name: TcpPort
+      data: 1433
+  register: win_reg
+
+
+- name: Install MS SQL Server using psexec module
+  win_psexec:
+   command: c:\sql\installer\setup.exe /ConfigurationFile="c:\sql\sql_conf.ini" /INDICATEPROGRESS=False
+   priority: high
+   executable: C:\PSTools\PsExec64.exe
+   elevated: yes
+   nobanner: yes
+   system: yes
+
+- name: Restart a service
+  win_service:
+      name: 'MSSQL${{ sql_instance_name }}'
+      force_dependent_services: yes
+      state: restarted
+  when: win_reg.changed

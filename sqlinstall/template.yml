@@ -1,0 +1,24 @@
+tasks:
+    - name: Disable UAC Filtering for Local Accounts
+      win_regedit: 
+        data: 1
+        datatype: dword
+        key: "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
+        value: LocalAccountTokenFilterPolicy
+
+- name: install sql
+   win_psexec:
+     command:  C:\Users\Administrator\Desktop\sql\Setup.exe /ConfigurationFile=C:\Users\Administrator\Desktop\ConfigurationFile.ini /INDICATEPROGRESS=False
+     username: "{{Your_username}}"
+     password: "{{Your_password}}"
+     priority: high
+     executable: "{{path_to_psexec.exe}}"
+
+
+- name: Create (or update) SQL Server
+  azure_rm_sqlserver:
+    resource_group: resource_group
+    name: server_name
+    location: westus
+    admin_username: mylogin
+    admin_password: Testpasswordxyz12!

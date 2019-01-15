@@ -1,0 +1,1 @@
+c:\sql\installer\setup.exe /ConfigurationFile="c:\sql\sql_conf.ini" /INDICATEPROGRESS=False
