@@ -31,7 +31,7 @@
 - name: get the SQL installer
   win_get_url:
 #      url: 'http://download.microsoft.com/download/E/A/E/EAE6F7FC-767A-4038-A954-49B8B05D04EB/ExpressAndTools%2064BIT/SQLEXPRWT_x64_ENU.exe'
-      url: 'https://download.microsoft.com/download/9/2/B/92BAD988-00C5-4F68-811E-B7FFBE009B00/SQLServer2016SP2-KB4052908-x64-ENU.exe'
+      url: 'https://download.microsoft.com/download/3/7/6/3767D272-76A1-4F31-8849-260BD37924E4/SQLServer2016-SSEI-Expr.exe'
       dest: 'c:\sql\sql_installer.exe'
   when: not installer_file.stat.exists
 
@@ -67,16 +67,6 @@
       chdir: c:\sql
       creates: c:\sql\installer\setup.exe
    
-#- name: Install the database
-# win_command: c:\sql\installer\setup.exe /configurationfile=c:\sql\sql_conf.ini
-#  args:
-#      chdir: c:\sql
-
-#- name: Copy psexec module
-#  copy:
-#    src: PsExec.exe
-#    dest: c:\sql
-
 - name: Disable UAC Filtering for Local Accounts
   win_regedit: 
       data: 1
@@ -103,17 +93,17 @@
   register: win_reg
 
 
-# - name: Install MS SQL Server using psexec module
-#   win_psexec:
-#    command: c:\sql\installer\setup.exe /ConfigurationFile="c:\sql\sql_conf.ini" /INDICATEPROGRESS=False
-#    priority: high
-#    executable: C:\PSTools\PsExec64.exe
-#    elevated: yes
-#    nobanner: yes
-#    system: yes
+- name: Install MS SQL Server using psexec module
+  win_psexec:
+   command: c:\sql\installer\setup.exe /ConfigurationFile="c:\sql\sql_conf.ini" /INDICATEPROGRESS=False
+   priority: high
+   executable: C:\PSTools\PsExec64.exe
+   elevated: yes
+   nobanner: yes
+   system: yes
 
-- name: run InstallSQLwithConfigIni.cmd script
-  script: c:\\sql\\InstallSQLwithConfigIni.cmd
+# - name: run InstallSQLwithConfigIni.cmd script
+#   script: c:\\sql\\InstallSQLwithConfigIni.cmd
 
 - name: Restart a service
   win_service:
