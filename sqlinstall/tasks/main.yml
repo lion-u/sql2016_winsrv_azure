@@ -92,15 +92,23 @@
       data: 1433
   register: win_reg
 
-
 - name: Install MS SQL Server using psexec module
-  win_psexec:
-   command: c:\sql\sql_installer.exe /ConfigurationFile="c:\sql\sql_conf.ini" /INDICATEPROGRESS=False /Action=Install
-   priority: high
-   executable: C:\PSTools\PsExec64.exe
-   elevated: yes
-   nobanner: yes
-   system: yes
+  raw: 'c:\sql\sql_installer.exe /CONFIGURATIONFILE="c:\sql\sql_conf.ini" /IACCEPTSQLSERVERLICENSETERMS /HIDEPROGRESSBAR /ACTION=Install /ENU /QUIET'
+#    priority: high
+#    executable: C:\PSTools\PsExec64.exe
+#    elevated: yes
+#    nobanner: yes
+#    system: yes
+
+
+# - name: Install MS SQL Server using psexec module
+#   win_psexec:
+#    command: c:\sql\sql_installer.exe /CONFIGURATIONFILE="c:\sql\sql_conf.ini" /IACCEPTSQLSERVERLICENSETERMS /HIDEPROGRESSBAR /ACTION=Install /ENU /QUIET
+#    priority: high
+#    executable: C:\PSTools\PsExec64.exe
+#    elevated: yes
+#    nobanner: yes
+#    system: yes
 
 # - name: run InstallSQLwithConfigIni.cmd script
 #   script: c:\\sql\\InstallSQLwithConfigIni.cmd
