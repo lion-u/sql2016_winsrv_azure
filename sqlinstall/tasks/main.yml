@@ -31,7 +31,7 @@
 - name: get the SQL installer
   win_get_url:
 #      url: 'http://download.microsoft.com/download/E/A/E/EAE6F7FC-767A-4038-A954-49B8B05D04EB/ExpressAndTools%2064BIT/SQLEXPRWT_x64_ENU.exe'
-      url: 'https://download.microsoft.com/download/3/7/6/3767D272-76A1-4F31-8849-260BD37924E4/SQLServer2016-SSEI-Expr.exe'
+      url: 'https://download.microsoft.com/download/9/0/7/907AD35F-9F9C-43A5-9789-52470555DB90/ENU/SQLEXPR_x64_ENU.exe'
       dest: 'c:\sql\sql_installer.exe'
   when: not installer_file.stat.exists
 
@@ -61,11 +61,11 @@
     - NET-Framework-45-ASPNET
     state: present
 
-# - name: extract the installer
-#   win_command: c:\sql\sql_installer.exe /q /x:c:\sql\installer
-#   args:
-#       chdir: c:\sql
-#       creates: c:\sql\installer\setup.exe
+- name: extract the installer
+  win_command: c:\sql\sql_installer.exe /q /x:c:\sql\installer
+  args:
+      chdir: c:\sql
+      creates: c:\sql\installer\setup.exe
    
 - name: Disable UAC Filtering for Local Accounts
   win_regedit: 
@@ -92,23 +92,23 @@
       data: 1433
   register: win_reg
 
-- name: Install MS SQL Server using psexec module
-  raw: 'c:\sql\sql_installer.exe /CONFIGURATIONFILE="c:\sql\sql_conf.ini" /IACCEPTSQLSERVERLICENSETERMS /HIDEPROGRESSBAR /ACTION=Install /ENU /QUIET'
-#    priority: high
-#    executable: C:\PSTools\PsExec64.exe
-#    elevated: yes
-#    nobanner: yes
-#    system: yes
-
-
 # - name: Install MS SQL Server using psexec module
-#   win_psexec:
-#    command: c:\sql\sql_installer.exe /CONFIGURATIONFILE="c:\sql\sql_conf.ini" /IACCEPTSQLSERVERLICENSETERMS /HIDEPROGRESSBAR /ACTION=Install /ENU /QUIET
+#   raw: 'c:\sql\sql_installer.exe /CONFIGURATIONFILE="c:\sql\sql_conf.ini" /IACCEPTSQLSERVERLICENSETERMS /HIDEPROGRESSBAR /ACTION=Install /ENU /QUIET'
 #    priority: high
 #    executable: C:\PSTools\PsExec64.exe
 #    elevated: yes
 #    nobanner: yes
 #    system: yes
+
+
+- name: Install MS SQL Server using psexec module
+  win_psexec:
+   command: 'c:\sql\installer\setup.exe /Q /IACCEPTSQLSERVERLICENSETERMS /ACTION=install /FEATURES=SQL,AS,RS,IS,Tools /CONFIGURATIONFILE="c:\sql\sql_conf.ini"'
+   priority: high
+   executable: C:\PSTools\PsExec64.exe
+   elevated: yes
+   nobanner: yes
+   system: yes
 
 # - name: run InstallSQLwithConfigIni.cmd script
 #   script: c:\\sql\\InstallSQLwithConfigIni.cmd
