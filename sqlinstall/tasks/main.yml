@@ -103,7 +103,7 @@
 
 - name: Install MS SQL Server using psexec module
   win_psexec:
-   command: 'c:\sql\installer\setup.exe /Q /IACCEPTSQLSERVERLICENSETERMS /ACTION=install /FEATURES=SQL,AS,RS,IS,Tools /CONFIGURATIONFILE="c:\sql\sql_conf.ini"'
+   command: 'c:\sql\installer\setup.exe /Q /IACCEPTSQLSERVERLICENSETERMS /ACTION=install /FEATURES=SQL,AS,RS,IS,Tools /SAPWD={{sapass}} /CONFIGURATIONFILE="c:\sql\sql_conf.ini"'
    priority: high
    executable: C:\PSTools\PsExec64.exe
    elevated: yes
