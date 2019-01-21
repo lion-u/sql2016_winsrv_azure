@@ -90,7 +90,8 @@
       path: 'HKLM:\Software\Microsoft\Microsoft SQL Server\MSSQL13.{{ sql_instance_name }}\MSSQLServer\SuperSocketNetLib\Tcp\IPAll'
       name: TcpPort
       data: 1433
-  register: win_reg
+      state: present
+#  register: win_reg
 
 # - name: Install MS SQL Server using psexec module
 #   raw: 'c:\sql\sql_installer.exe /CONFIGURATIONFILE="c:\sql\sql_conf.ini" /IACCEPTSQLSERVERLICENSETERMS /HIDEPROGRESSBAR /ACTION=Install /ENU /QUIET'
@@ -118,4 +119,4 @@
       name: 'MSSQL${{ sql_instance_name }}'
       force_dependent_services: yes
       state: restarted
-  when: win_reg.changed
+#  when: win_reg.changed
